@@ -6,10 +6,8 @@ import argparse
 import dotenv
 from openai import OpenAI
 
-client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
-
 dotenv.load_dotenv()
-
+client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
 
 def make(prompt: str) -> str:
 
@@ -20,9 +18,8 @@ def make(prompt: str) -> str:
         {"role": "user", "content": prompt},
     ],
     max_tokens=1024)
-
-    message = response.choices[0].message
-    return message['content']
+    message = response.choices[0].message.content
+    return message
 
 def find_all_tex_files(dir: str):
     return [str(i) for i in list(pathlib.Path(dir).rglob('*.tex'))]
