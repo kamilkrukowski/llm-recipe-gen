@@ -4,25 +4,24 @@ import os
 import argparse
 
 import dotenv
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
 
 dotenv.load_dotenv()
 
-openai.api_key = os.environ['OPENAI_API_KEY']
 
-def make(prompt: str, n=1) -> str:
-    
-    response = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
-        n=1,
-        messages=[
-            {"role": "system", "content": "You are a professional cookbook editor and writer."},
-            {"role": "user", "content": prompt},
-        ],
-        max_tokens=1024,
-        )
+def make(prompt: str) -> str:
 
-    message = response.choices[0]['message']
+    response = client.chat.completions.create(model='gpt-3.5-turbo',
+    n=1,
+    messages=[
+        {"role": "system", "content": "You are a professional cookbook editor and writer."},
+        {"role": "user", "content": prompt},
+    ],
+    max_tokens=1024)
+
+    message = response.choices[0].message
     return message['content']
 
 def find_all_tex_files(dir: str):
@@ -135,19 +134,21 @@ def generate_recipe(recipe_name: str) -> None:
             clean_subset = re.search(pattern = '\\\\begin\{recipe\}[\s\S]+?\\\\end\{recipe\}', string=result).group(0)
             with open(path, "w") as f:
                 f.write(clean_subset)
-        except:
+        except Exception as e:
+            print("Failed to generate recipe for ", target)
+            print(e)
             pass
 
 parser = argparse.ArgumentParser(description='Generate a recipe')
 parser.add_argument('-r', '--recipe', type=str, help='The name of the recipe to generate', default='Lemon Squares')
 
 target_recipe = parser.parse_args().recipe
+print("Recipe is: ", target_recipe)
 
 generate_recipe(target_recipe)
 target_recipe_list = [target_recipe]
 generate_main([i.replace(' ', '') for i in target_recipe_list])
-os.system('cd latex/ && pdflatex --interaction=nonstopmode main.tex && cd ../')
-
+#render()
 
 
 
