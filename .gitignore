@@ -1,0 +1,4 @@
+latex
+main*
+**.tex
+**.log
