@@ -1,4 +1,5 @@
-latex
+latex/recipes/ai_kept
+latex/recipes/raw_ai
 .env
 main*
 **.tex
